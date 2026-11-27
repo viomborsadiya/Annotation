@@ -79,8 +79,8 @@ function App() {
 
   useEffect(() => {
     if (!storageReady) return
-    setStorageStatus('saving')
     const timeout = window.setTimeout(() => {
+      setStorageStatus('saving')
       saveProject({ images, labels, annotations, activeImageId, activeLabelId })
         .then(() => setStorageStatus('saved'))
         .catch(() => {
