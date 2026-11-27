@@ -3,6 +3,7 @@ import type { CSSProperties, ChangeEvent, PointerEvent as ReactPointerEvent } fr
 import './App.css'
 import { loadProject, saveProject } from './storage'
 import type { Annotation, DatasetImage, LabelClass } from './types'
+import { createYoloDatasetZip } from './yoloZip'
 
 type Point = { x: number; y: number }
 
@@ -224,19 +225,20 @@ function App() {
     setNotice('COCO JSON export downloaded')
   }
 
-  function exportYolo() {
-    const lines = images.map((image) => {
-      const rows = annotations.filter((item) => item.imageId === image.id).map((item) => {
-        const classIndex = labels.findIndex((label) => label.id === item.labelId)
-        const centerX = item.x + item.width / 2
-        const centerY = item.y + item.height / 2
-        return `${classIndex} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${item.width.toFixed(6)} ${item.height.toFixed(6)}`
-      })
-      return `# ${image.name}\n${rows.join('\n')}`
-    }).join('\n\n')
-    const names = labels.map((label) => `  ${labels.indexOf(label)}: ${JSON.stringify(label.name)}`).join('\n')
-    downloadFile('annotation-yolo.txt', `# YOLO normalized xywh labels\n# Classes:\n${names}\n\n${lines}\n`, 'text/plain')
-    setNotice('YOLO labels downloaded. Each image section is identified by its filename.')
+  async function exportYolo() {
+    try {
+      setNotice('Preparing YOLO dataset ZIP…')
+      const archive = await createYoloDatasetZip(images, labels, annotations)
+      const url = URL.createObjectURL(archive)
+      const anchor = document.createElement('a')
+      anchor.href = url
+      anchor.download = 'annotation-yolo-dataset.zip'
+      anchor.click()
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000)
+      setNotice('YOLO dataset ZIP downloaded')
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'Could not create the YOLO dataset ZIP')
+    }
   }
 
   const draftBox = draft ? {
@@ -368,7 +370,7 @@ function App() {
           <div className="inspector-section export-section">
             <p className="eyebrow">EXPORT FORMATS</p>
             <button className="export-row" onClick={exportCoco} disabled={!images.length}><span className="format-icon">JSON</span><span><strong>COCO JSON</strong><small>Images, categories & bounding boxes</small></span><span>↗</span></button>
-            <button className="export-row" onClick={exportYolo} disabled={!images.length}><span className="format-icon yolo">TXT</span><span><strong>YOLO labels</strong><small>Normalized center x, y, width, height</small></span><span>↗</span></button>
+            <button className="export-row" onClick={exportYolo} disabled={!images.length}><span className="format-icon yolo">ZIP</span><span><strong>YOLO dataset ZIP</strong><small>Images, per-image labels & data.yaml</small></span><span>↗</span></button>
           </div>
           <div className="keyboard-hint"><span>SHORTCUTS</span><p><kbd>Ctrl</kbd> + <kbd>Z</kbd> <span>Undo</span></p><p><kbd>Del</kbd> <span>Delete selected box</span></p><p><kbd>Esc</kbd> <span>Clear selection</span></p></div>
         </aside>
