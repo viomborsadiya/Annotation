@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, ChangeEvent, PointerEvent as ReactPointerEvent } from 'react'
 import './App.css'
+import { loadProject, saveProject } from './storage'
+import type { Annotation, DatasetImage, LabelClass } from './types'
 
-type DatasetImage = { id: string; name: string; src: string; width: number; height: number }
-type LabelClass = { id: string; name: string; color: string }
-type Annotation = { id: string; imageId: string; labelId: string; x: number; y: number; width: number; height: number }
 type Point = { x: number; y: number }
 
 const starterLabels: LabelClass[] = [
@@ -50,8 +49,47 @@ function App() {
   const [history, setHistory] = useState<Annotation[][]>([])
   const [newLabel, setNewLabel] = useState('')
   const [notice, setNotice] = useState('')
+  const [storageReady, setStorageReady] = useState(false)
+  const [storageStatus, setStorageStatus] = useState<'loading' | 'saved' | 'saving' | 'error'>('loading')
   const stageRef = useRef<HTMLDivElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    loadProject().then((saved) => {
+      if (cancelled) return
+      if (saved) {
+        setImages(saved.images)
+        setLabels(saved.labels)
+        setAnnotations(saved.annotations)
+        setActiveImageId(saved.activeImageId ?? saved.images[0]?.id ?? null)
+        setActiveLabelId(saved.activeLabelId && saved.labels.some((label) => label.id === saved.activeLabelId)
+          ? saved.activeLabelId
+          : saved.labels[0]?.id ?? starterLabels[0].id)
+      }
+      setStorageStatus('saved')
+      setStorageReady(true)
+    }).catch(() => {
+      if (cancelled) return
+      setStorageStatus('error')
+      setNotice('Browser storage is unavailable. Export your work regularly.')
+    })
+    return () => { cancelled = true }
+  }, [])
+
+  useEffect(() => {
+    if (!storageReady) return
+    setStorageStatus('saving')
+    const timeout = window.setTimeout(() => {
+      saveProject({ images, labels, annotations, activeImageId, activeLabelId })
+        .then(() => setStorageStatus('saved'))
+        .catch(() => {
+          setStorageStatus('error')
+          setNotice('Could not save locally. Export your dataset to keep a backup.')
+        })
+    }, 500)
+    return () => window.clearTimeout(timeout)
+  }, [storageReady, images, labels, annotations, activeImageId, activeLabelId])
 
   const activeImage = images.find((image) => image.id === activeImageId) ?? null
   const imageAnnotations = annotations.filter((item) => item.imageId === activeImageId)
@@ -212,7 +250,7 @@ function App() {
     <main className="app-shell">
       <header className="topbar">
         <a className="brand" href="#" aria-label="Annotation home"><span className="brand-mark">A</span><span>annotation<span className="brand-dot">.</span></span></a>
-        <div className="topbar-center"><span className="status-dot" /> Local workspace <span className="topbar-divider">/</span> <span>{images.length} images</span></div>
+        <div className="topbar-center"><span className="status-dot" /> {storageStatus === 'loading' ? 'Restoring workspace' : storageStatus === 'saving' ? 'Saving locally' : storageStatus === 'error' ? 'Local save unavailable' : 'Saved locally'} <span className="topbar-divider">/</span> <span>{images.length} images</span></div>
         <div className="topbar-actions">
           <button className="button button-quiet" onClick={undo} disabled={!history.length} title="Undo (Ctrl+Z)">↶ <span>Undo</span></button>
           <button className="button button-primary" onClick={exportCoco} disabled={!images.length}>Export dataset <span aria-hidden="true">↗</span></button>
@@ -252,7 +290,7 @@ function App() {
               <button type="submit" disabled={!newLabel.trim()} aria-label="Add label">＋</button>
             </form>
           </div>
-          <div className="sidebar-footer"><span className="privacy-icon">◈</span><span><strong>Your data stays local</strong><small>Images are processed in this browser.</small></span></div>
+          <div className="sidebar-footer"><span className="privacy-icon">◈</span><span><strong>Your data stays local</strong><small>Saved in this browser on this device.</small></span></div>
         </aside>
 
         <section className="main-panel">
