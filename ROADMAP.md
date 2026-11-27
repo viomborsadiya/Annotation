@@ -11,11 +11,10 @@ This roadmap describes possible development priorities. Items are not commitment
 - [x] Normalized YOLO bounding-box export
 - [x] Local-first processing without an application backend
 - [ ] Automated unit and browser interaction tests
-- [ ] Durable local project persistence
+- [x] Durable local project persistence (IndexedDB)
 
 ## Next: annotation quality
 
-- [ ] IndexedDB-backed project persistence and recovery
 - [ ] Undo/redo for all editing operations
 - [ ] Keyboard-first annotation workflow
 - [ ] Polygon and semantic segmentation tools

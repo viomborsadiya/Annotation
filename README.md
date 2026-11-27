@@ -17,7 +17,7 @@ Annotation is a browser-based tool for organizing image datasets, drawing boundi
 - Undo the most recent annotation changes with `Ctrl/⌘ + Z`.
 - Export a COCO-style JSON document or YOLO normalized bounding-box labels.
 - Responsive workspace with dataset summary and keyboard shortcuts.
-- Local-first processing: image data remains in the current browser session.
+- Local-first processing: images and annotations are saved in this browser using IndexedDB and restored on return.
 
 ## Quick start
 
@@ -55,7 +55,7 @@ See [docs/annotation-formats.md](docs/annotation-formats.md) for details and lim
 
 ## Privacy and data handling
 
-The application uses the browser File API and in-memory data URLs. It does not currently include a backend, account system, analytics, or remote image storage. Refreshing or closing the tab clears the current working session. Do not use this MVP as the only copy of important annotation work; export your dataset regularly.
+The application uses the browser File API and IndexedDB. Images and annotations are stored locally in this browser on this device; they are not uploaded to an application server. The project is restored when you reopen the app in the same browser profile. Clearing site data, using a different browser or device, or losing the browser profile can remove the saved project. There is no account system, analytics, or remote image storage. Export your dataset regularly and keep an independent backup.
 
 ## Project principles
 
