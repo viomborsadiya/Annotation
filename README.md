@@ -2,6 +2,8 @@
 
 **A local-first, open-source image annotation workspace for machine-learning datasets.**
 
+[**Try the live demo →**](https://annotation-eosin.vercel.app/)
+
 Annotation is a browser-based tool for organizing image datasets, drawing bounding boxes, assigning label classes, and exporting annotations for common computer-vision workflows. Images are read locally in your browser; this starter application does not upload them to a server.
 
 > Status: early development / MVP. The current release focuses on image-level bounding-box annotation. Review the roadmap before relying on it for production dataset pipelines.
