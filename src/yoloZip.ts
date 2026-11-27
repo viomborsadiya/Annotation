@@ -71,7 +71,8 @@ function zipStore(entries: ArchiveEntry[]): Blob {
   endView.setUint16(10, entries.length, true)
   endView.setUint32(12, centralDirectory.length, true)
   endView.setUint32(16, localOffset, true)
-  return new Blob([concatBytes([...localParts, centralDirectory, end])], { type: 'application/zip' })
+  const archiveBytes = concatBytes([...localParts, centralDirectory, end])
+  return new Blob([archiveBytes.buffer as ArrayBuffer], { type: 'application/zip' })
 }
 
 function safeStem(filename: string): string {
