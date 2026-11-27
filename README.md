@@ -1,73 +1,79 @@
-# React + TypeScript + Vite
+# Annotation
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+**A local-first, open-source image annotation workspace for machine-learning datasets.**
 
-Currently, two official plugins are available:
+Annotation is a browser-based tool for organizing image datasets, drawing bounding boxes, assigning label classes, and exporting annotations for common computer-vision workflows. Images are read locally in your browser; this starter application does not upload them to a server.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+> Status: early development / MVP. The current release focuses on image-level bounding-box annotation. Review the roadmap before relying on it for production dataset pipelines.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Add multiple JPG, PNG, and WEBP images.
+- Draw and select bounding boxes on an image.
+- Create and switch between label classes.
+- Inspect normalized box coordinates and delete selected annotations.
+- Undo the most recent annotation changes with `Ctrl/⌘ + Z`.
+- Export a COCO-style JSON document or YOLO normalized bounding-box labels.
+- Responsive workspace with dataset summary and keyboard shortcuts.
+- Local-first processing: image data remains in the current browser session.
 
-## Expanding the ESLint configuration
+## Quick start
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Requirements: Node.js 20.19+ or 22.12+, and npm.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/viomborsadiya/Annotation.git
+cd Annotation
+npm ci
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open the local URL printed by Vite. To create a production build:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run lint
+npm run build
+npm run preview
 ```
+
+## How to use
+
+1. Select **Add images** and choose one or more images.
+2. Choose a label class in the left sidebar.
+3. Click and drag on the image to create a bounding box.
+4. Select a box to inspect or change its label; press **Delete** to remove it.
+5. Export the dataset as COCO JSON or YOLO text labels.
+
+### Export notes
+
+- **COCO JSON** contains image metadata, category definitions, and bounding boxes in pixel coordinates `[x, y, width, height]`.
+- **YOLO** contains normalized `class_id center_x center_y width height` values. The current MVP downloads one text document with image-name separators; a future dataset packaging workflow will emit one label file per image and a `data.yaml` manifest.
+
+See [docs/annotation-formats.md](docs/annotation-formats.md) for details and limitations.
+
+## Privacy and data handling
+
+The application uses the browser File API and in-memory data URLs. It does not currently include a backend, account system, analytics, or remote image storage. Refreshing or closing the tab clears the current working session. Do not use this MVP as the only copy of important annotation work; export your dataset regularly.
+
+## Project principles
+
+- **Useful before flashy:** prioritize reliable annotation workflows and interoperable exports.
+- **Local-first by default:** keep dataset content on the user's device unless an explicit sync feature is introduced.
+- **Transparent limitations:** document what is implemented, what is experimental, and what is planned.
+- **Open collaboration:** welcome bug reports, reproducible examples, tests, and focused pull requests.
+
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening an issue or pull request. Please include reproduction steps for bugs and tests for behavior changes where practical.
+
+## Security
+
+Please see [SECURITY.md](SECURITY.md) for responsible vulnerability reporting.
+
+## Roadmap
+
+See [ROADMAP.md](ROADMAP.md) for planned work. Roadmap items are intentions, not shipped features.
+
+## License
+
+Distributed under the [MIT License](LICENSE).
