@@ -22,7 +22,7 @@ let databasePromise: Promise<IDBDatabase> | null = null
 function openDatabase(): Promise<IDBDatabase> {
   if (databasePromise) return databasePromise
 
-  databasePromise = new Promise((resolve, reject) => {
+  const opening = new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(DATABASE_NAME, DATABASE_VERSION)
     request.onupgradeneeded = () => {
       const database = request.result
@@ -37,12 +37,13 @@ function openDatabase(): Promise<IDBDatabase> {
     }
     request.onerror = () => reject(request.error ?? new Error('Could not open local project storage'))
     request.onblocked = () => reject(new Error('Local project storage is blocked by another tab'))
-  }).catch((error: unknown) => {
+  })
+  const cached = opening.catch((error: unknown) => {
     databasePromise = null
     throw error
   })
-
-  return databasePromise
+  databasePromise = cached
+  return cached
 }
 
 export async function loadProject(): Promise<ProjectSnapshot | null> {
