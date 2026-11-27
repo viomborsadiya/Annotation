@@ -15,7 +15,7 @@ Annotation is a browser-based tool for organizing image datasets, drawing boundi
 - Create and switch between label classes.
 - Inspect normalized box coordinates and delete selected annotations.
 - Undo the most recent annotation changes with `Ctrl/⌘ + Z`.
-- Export a COCO-style JSON document or YOLO normalized bounding-box labels.
+- Export a COCO-style JSON document or a YOLO dataset ZIP with images, per-image labels, and a `data.yaml` manifest.
 - Responsive workspace with dataset summary and keyboard shortcuts.
 - Local-first processing: images and annotations are saved in this browser using IndexedDB and restored on return.
 

@@ -23,7 +23,7 @@ This roadmap describes possible development priorities. Items are not commitment
 
 ## Next: dataset interoperability
 
-- [ ] Export a downloadable ZIP with one YOLO label file per image
+- [x] Export a downloadable ZIP with one YOLO label file per image and data.yaml
 - [ ] Generate YOLO `data.yaml` and class manifests
 - [ ] COCO import and round-trip validation
 - [ ] Export validation reports and empty-label handling

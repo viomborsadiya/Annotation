@@ -20,12 +20,12 @@ Each annotation is represented as:
 class_id center_x center_y width height
 ```
 
-All four geometric values are normalized to the range 0–1. Class IDs follow the current label order in the UI. The current MVP writes all image sections into one text download with filename comment separators; this is a convenience export, not yet a complete Ultralytics dataset directory.
+All four geometric values are normalized to the range 0–1. Class IDs follow the current label order in the UI. The YOLO dataset ZIP includes source images and a matching label file for every image, including empty label files for images without boxes. Files are arranged under `images/train`, `images/val`, `labels/train`, and `labels/val`, with a root `data.yaml` containing class names and split paths. A deterministic holdout assigns approximately one in five images to validation when there are multiple images. With a single image, all data remains in training; create a separate validation set before evaluating a model.
 
 ## Important limitations
 
-- The current session is held in memory and is cleared when the page reloads.
-- The YOLO download is not yet a ZIP archive with one `.txt` file per image.
+- Projects are saved in IndexedDB in the current browser profile. Clearing site data or switching browsers/devices removes access to that local copy.
+- The ZIP uses uncompressed entries to keep the implementation dependency-free; very large datasets may require substantial browser memory while exporting.
 - There is no import workflow or round-trip guarantee yet.
 - There are no polygon, mask, keypoint, or rotated-box exports.
 - Validate exported files against the exact training tool and dataset schema you intend to use.
