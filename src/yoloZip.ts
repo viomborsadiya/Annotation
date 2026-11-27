@@ -115,9 +115,7 @@ export async function createYoloDatasetZip(
 
   const entries: ArchiveEntry[] = []
   const usedNames = new Set<string>()
-  const names: string[] = []
-  const classIds = new Map(labels.map((label, index) => [label.id, index]))
-  const imageById = new Map(images.map((image) => [image.id, image]))
+    const classIds = new Map(labels.map((label, index) => [label.id, index]))
 
   for (let index = 0; index < images.length; index += 1) {
     const image = images[index]
@@ -130,7 +128,6 @@ export async function createYoloDatasetZip(
       suffix += 1
     }
     usedNames.add(filename.toLowerCase())
-    names.push(filename)
 
     const split = validationIndexes.has(index) ? 'val' : 'train'
     entries.push({ name: `images/${split}/${filename}`, data: await imageBytes(image.src) })
