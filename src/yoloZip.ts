@@ -75,15 +75,15 @@ function zipStore(entries: ArchiveEntry[]): Blob {
 }
 
 function safeStem(filename: string): string {
-  const withoutExtension = filename.replace(/\\.[^.]*$/, '')
+  const withoutExtension = filename.replace(/\.[^.]*$/, '')
   const cleaned = withoutExtension.normalize('NFKD').replace(/[^a-zA-Z0-9_-]+/g, '_').replace(/^_+|_+$/g, '')
   return cleaned || 'image'
 }
 
 function imageExtension(image: DatasetImage): string {
-  const match = /^data:image\\/([a-zA-Z0-9.+-]+);base64,/.exec(image.src)
+  const match = /^data:image\/([a-zA-Z0-9.+-]+);base64,/.exec(image.src)
   const mimeExtension = match?.[1]?.toLowerCase().replace('jpeg', 'jpg')
-  const filenameExtension = /\\.([a-zA-Z0-9]+)$/.exec(image.name)?.[1]?.toLowerCase()
+  const filenameExtension = /\.([a-zA-Z0-9]+)$/.exec(image.name)?.[1]?.toLowerCase()
   const allowed = new Set(['jpg', 'jpeg', 'png', 'webp', 'bmp', 'tif', 'tiff'])
   return filenameExtension && allowed.has(filenameExtension) ? filenameExtension : mimeExtension || 'png'
 }
@@ -115,7 +115,7 @@ export async function createYoloDatasetZip(
 
   const entries: ArchiveEntry[] = []
   const usedNames = new Set<string>()
-    const classIds = new Map(labels.map((label, index) => [label.id, index]))
+  const classIds = new Map(labels.map((label, index) => [label.id, index]))
 
   for (let index = 0; index < images.length; index += 1) {
     const image = images[index]
@@ -140,7 +140,7 @@ export async function createYoloDatasetZip(
         const centerY = annotation.y + annotation.height / 2
         return `${classId} ${centerX.toFixed(6)} ${centerY.toFixed(6)} ${annotation.width.toFixed(6)} ${annotation.height.toFixed(6)}`
       })
-    entries.push({ name: `labels/${split}/${safeStem(filename)}.txt`, data: encoder.encode(rows.length ? `${rows.join('\\n')}\\n` : '') })
+    entries.push({ name: `labels/${split}/${safeStem(filename)}.txt`, data: encoder.encode(rows.length ? `${rows.join('\n')}\n` : '') })
   }
 
   const yaml = [
@@ -150,7 +150,7 @@ export async function createYoloDatasetZip(
     'names:',
     ...labels.map((label, index) => `  ${index}: ${yamlString(label.name)}`),
     '',
-  ].join('\\n')
+  ].join('\n')
   entries.push({ name: 'data.yaml', data: encoder.encode(yaml) })
   entries.push({ name: 'README.txt', data: encoder.encode([
     'YOLO object detection dataset exported by Annotation.',
@@ -163,6 +163,6 @@ export async function createYoloDatasetZip(
       : 'A deterministic holdout split is used: approximately one image in five is assigned to validation (at least one when possible).',
     'Review the split and class distribution before training.',
     '',
-  ].join('\\n')) })
+  ].join('\n')) })
   return zipStore(entries)
 }
